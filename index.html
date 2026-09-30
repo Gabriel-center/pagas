@@ -680,9 +680,10 @@ function calcularPaga({inicio, fim, tipos, especial, valorCustom, ressarcimento}
   const back = tipos.includes('backdrop');
 
   let vale, motivo = '';
-  if(back && !op && !mont){ vale = false; motivo = 'backdrop sozinho não tem paga, só o bônus'; }
+  if(especial === 'custom') vale = true;  // customizada: sempre vale (multiplicador mínimo 1), com qualquer tipo e duração
+  else if(back && !op && !mont){ vale = false; motivo = 'backdrop sozinho não tem paga, só o bônus'; }
   else if(op) vale = true;
-  else if(fds || feriado || especial === 'custom') vale = true;  // customizada: vale com qualquer duração
+  else if(fds || feriado) vale = true;
   else if(horas > REGRAS.horasMinMontagemSemana) vale = true;
   else { vale = false; motivo = `montagem em dia útil precisa passar de ${REGRAS.horasMinMontagemSemana} h`; }
 
@@ -1253,10 +1254,10 @@ function sincronizarControles(){
   $('#customBox').classList.toggle('hidden', form.especial !== 'custom');
   $('#ressBox').classList.toggle('hidden', !$('#fRessOn').checked);
   $('#espNota').textContent = form.especial === 'feriado'
-  ? 'Feriado: paga base de R$ 280, e montagem vale com qualquer duração.'
-  : form.especial === 'custom'
-  ? 'Customizada: a paga vale com qualquer duração, inclusive só montagem.'
-  : 'Sábado e domingo já contam como R$ 280 automaticamente.';
+    ? 'Feriado: paga base de R$ 280, e montagem vale com qualquer duração.'
+    : form.especial === 'custom'
+    ? 'Customizada: a paga sempre vale, com qualquer tipo e qualquer duração.'
+    : 'Sábado e domingo já contam como R$ 280 automaticamente.';
 }
 
 function copiarFim(){
